@@ -1,4 +1,5 @@
 var taskIdCounter = 0;
+var pageContentEl = document.querySelector('#page-content');
 var taskToDoEl = document.querySelector('#tasks-to-do');
 var formEl = document.querySelector('#task-form');
 
@@ -82,8 +83,42 @@ var createTaskActions = function (taskId) {
     //Make 2 buttons and a drop down menu
 }
 
-formEl.addEventListener('submit', taskFormHandler);
+var taskButtonHandler = function (event) {
+    // console.log(event.target);
+    if (event.target.matches(".edit-btn")) {
+        var taskId = event.target.getAttribute("data-task-id");
+        editTask(taskId);
+    } else if (event.target.matches(".delete-btn")) {
+        var taskId = event.target.getAttribute("data-task-id");
+        deleteTask(taskId);
+    }
 
+};
+
+var editTask = function (taskId) {
+    console.log("editing task #" + taskId);
+
+    //Get task list item element, since there are multiple
+    //Asking what are we specifically trying to get, then being more specific
+    //Here, we want a task item, and then a specific one
+    var taskSelected = document.querySelector(`.task-item[data-task-id='${taskId}']`);
+    var taskName = taskSelected.querySelector('h3.task-name').textContent;
+    var taskType = taskSelected.querySelector("span.task-type").textContent;
+
+    document.querySelector('input[name="task-name"]').value = taskName;
+    document.querySelector('select[name="task-type"]').value = taskType;
+    document.querySelector('#save-task').textContent = "Save Task";
+    // Getting the specific task to have the right ID by giving the formEl that ID, huh.
+    formEl.setAttribute("data-task-id", taskId);
+}
+
+var deleteTask = function (taskId) {
+    var taskSelected = document.querySelector(`.task-item[data-task-id='${taskId}']`);
+    taskSelected.remove();
+}
+
+formEl.addEventListener('submit', taskFormHandler);
+pageContentEl.addEventListener('click', taskButtonHandler);
 // // getName takes a function as a parameter
 // var getName = function (callBack) {
 //     var name = prompt("Enter name:");
