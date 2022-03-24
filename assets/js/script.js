@@ -1,24 +1,36 @@
 var taskToDoEl = document.querySelector('#tasks-to-do');
 var formEl = document.querySelector('#task-form');
 
-var createTaskHandler = function (event) {
+var taskFormHandler = function (event) {
     event.preventDefault();
 
     var taskNameInput = document.querySelector("input[name='task-name']").value;
     var taskTypeInput = document.querySelector("select[name='task-type']").value;
+    var taskDataObj = {
+        name: taskNameInput,
+        type: taskTypeInput,
+    };
+    createTaskEl(taskDataObj);
+}
 
+
+//Passing in only one variable that hold both the name and the type, so we are going to make an object
+// We're not passing html elements around, this is kinda the end point of what we're trying to do
+var createTaskEl = function (taskDataObj) {
     var listItemEl = document.createElement("li");
     listItemEl.className = "task-item";
 
     //div that holds info about task to be added
     var taskInfoEl = document.createElement("div");
     taskInfoEl.className = "task-info";
-    taskInfoEl.innerHTML = "<h3 class='task-name'>" + taskNameInput + "</h3><span class='task-type'>" + taskTypeInput + "</span>";
+    taskInfoEl.innerHTML = "<h3 class='task-name'>" + taskDataObj.name +
+        "</h3><span class='task-type'>" + taskDataObj.type + "</span>";
     listItemEl.appendChild(taskInfoEl);
     taskToDoEl.appendChild(listItemEl);
 }
 
-formEl.addEventListener('submit', createTaskHandler);
+
+formEl.addEventListener('submit', taskFormHandler);
 
 // // getName takes a function as a parameter
 // var getName = function (callBack) {
