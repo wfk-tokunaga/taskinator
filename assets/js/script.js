@@ -1,6 +1,8 @@
 var taskIdCounter = 0;
 var pageContentEl = document.querySelector('#page-content');
-var taskToDoEl = document.querySelector('#tasks-to-do');
+var tasksToDoEl = document.querySelector('#tasks-to-do');
+var tasksCompletedEl = document.querySelector('#tasks-completed');
+var tasksInProgressEl = document.querySelector('#tasks-in-progress');
 var formEl = document.querySelector('#task-form');
 
 var taskFormHandler = function (event) {
@@ -14,11 +16,36 @@ var taskFormHandler = function (event) {
         return false;
     }
     formEl.reset();
-    var taskDataObj = {
-        name: taskNameInput,
-        type: taskTypeInput,
-    };
-    createTaskEl(taskDataObj);
+    var isEdit = formEl.hasAttribute("data-task-id");
+
+    // Check to see if we're editing an old task or making a new one
+    if (isEdit) {
+        // If old task
+        var taskId = formEl.getAttribute(`data-task-id`);
+        completeEditTask(taskNameInput, taskTypeInput, taskId);
+    } else {
+        // If new task, then create the new li
+        var taskDataObj = {
+            name: taskNameInput,
+            type: taskTypeInput,
+        };
+        createTaskEl(taskDataObj);
+    }
+}
+
+var completeEditTask = function (taskName, taskType, taskId) {
+    var taskSelected = document.querySelector(`.task-item[data-task-id='${taskId}']`);
+    taskSelected.querySelector("h3.task-name").textContent = taskName;
+    taskSelected.querySelector("span.task-type").textContent = taskType;
+
+    alert("task updated!");
+
+    // Reset the form
+    formEl.removeAttribute(`data-task-id`);
+    document.querySelector(`#save-task`).textContent = "Add Task";
+
+    // How would I do this? 
+    // I think I would remove the old task and make a new one with the new info
 }
 
 
@@ -39,7 +66,7 @@ var createTaskEl = function (taskDataObj) {
     listItemEl.appendChild(taskInfoEl);
     var taskActionEl = createTaskActions(taskIdCounter);
     listItemEl.appendChild(taskActionEl)
-    taskToDoEl.appendChild(listItemEl);
+    tasksToDoEl.appendChild(listItemEl);
 
     taskIdCounter++;
 }
@@ -117,45 +144,24 @@ var deleteTask = function (taskId) {
     taskSelected.remove();
 }
 
+var taskStatusChangeHandler = function (event) {
+    var taskId = event.target.getAttribute(`data-task-id`);
+    // console.log(event.target.getAttribute(`data-task-id`));
+    var statusVariable = event.target.value.toLowerCase();
+    var taskSelected = document.querySelector(`.task-item[data-task-id='${taskId}']`);
+
+    if (statusVariable === "to-do") {
+        tasksToDoEl.appendChild(taskSelected);
+    }
+    else if (statusVariable === "in-progress") {
+        tasksInProgressEl.appendChild(taskSelected);
+    }
+    else if (statusVariable === "completed") {
+        tasksCompletedEl.appendChild(taskSelected);
+    }
+}
+
+
 formEl.addEventListener('submit', taskFormHandler);
 pageContentEl.addEventListener('click', taskButtonHandler);
-// // getName takes a function as a parameter
-// var getName = function (callBack) {
-//     var name = prompt("Enter name:");
-//     callBack(name);
-// }
-
-// var doSomethingWithName = function (name, somethingFunction) {
-//     somethingFunction(name);
-// }
-
-// function printName(name) {
-//     console.log(name);
-// }
-
-// function printDoubleName(name) {
-//     console.log(`${name}${name}`);
-// }
-
-// // var counter = 5;
-// // var everySec = function () {
-// //     console.log(counter);
-// //     counter--;
-// //     if (counter === 0) {
-// //         console.log('sad');
-// //         clearInterval(startCountdown);
-// //     };
-// // }
-
-// // var startCountdown = setInterval(everySec, 500);
-
-// var sayHello = function () {
-//     console.log("Hello");
-// };
-
-// var timedGreeting = setTimeout(sayHello, 2000);
-// clearTimeout(timedGreeting);
-
-// // startCountdown;
-// //We call a function like getName, which takes a function as a parameter
-// //It uses the callback function parameter in it's execution
+pageContentEl.addEventListener('change', taskStatusChangeHandler);
