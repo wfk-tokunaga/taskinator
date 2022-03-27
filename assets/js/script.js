@@ -40,14 +40,13 @@ var completeEditTask = function (taskName, taskType, taskId) {
     taskSelected.querySelector("h3.task-name").textContent = taskName;
     taskSelected.querySelector("span.task-type").textContent = taskType;
 
-    debugger;
     for (var i = 0; i < tasks.length; i++) {
         if (tasks[i].id === parseInt(taskId)) {
             tasks[i].name = taskName;
             tasks[i].type = taskType;
         }
     }
-    debugger;
+    saveTasks();
     alert("task updated!");
 
     // Reset the form
@@ -62,7 +61,6 @@ var completeEditTask = function (taskName, taskType, taskId) {
 //Passing in only one variable that hold both the name and the type, so we are going to make an object
 // We're not passing html elements around, this is kinda the end point of what we're trying to do
 var createTaskEl = function (taskDataObj) {
-    console.log(taskDataObj);
     var listItemEl = document.createElement("li");
     listItemEl.className = "task-item";
 
@@ -77,7 +75,7 @@ var createTaskEl = function (taskDataObj) {
     listItemEl.appendChild(taskInfoEl);
     taskDataObj.id = taskIdCounter; //Does this work? Can we just add a new field?
     tasks.push(taskDataObj);
-    console.log(tasks);
+    saveTasks();
     var taskActionEl = createTaskActions(taskIdCounter);
     listItemEl.appendChild(taskActionEl)
     tasksToDoEl.appendChild(listItemEl);
@@ -125,7 +123,6 @@ var createTaskActions = function (taskId) {
 }
 
 var taskButtonHandler = function (event) {
-    // console.log(event.target);
     if (event.target.matches(".edit-btn")) {
         var taskId = event.target.getAttribute("data-task-id");
         editTask(taskId);
@@ -137,8 +134,6 @@ var taskButtonHandler = function (event) {
 };
 
 var editTask = function (taskId) {
-    console.log("editing task #" + taskId);
-
     //Get task list item element, since there are multiple
     //Asking what are we specifically trying to get, then being more specific
     //Here, we want a task item, and then a specific one
@@ -151,6 +146,7 @@ var editTask = function (taskId) {
     document.querySelector('#save-task').textContent = "Save Task";
     // Getting the specific task to have the right ID by giving the formEl that ID, huh.
     formEl.setAttribute("data-task-id", taskId);
+
 }
 
 var deleteTask = function (taskId) {
@@ -163,13 +159,12 @@ var deleteTask = function (taskId) {
             updatedTaskArr.push(tasks[i]);
         }
     }
-
     tasks = updatedTasksArr;
+    saveTasks();
 }
 
 var taskStatusChangeHandler = function (event) {
     var taskId = event.target.getAttribute(`data-task-id`);
-    // console.log(event.target.getAttribute(`data-task-id`));
     var statusVariable = event.target.value.toLowerCase();
     var taskSelected = document.querySelector(`.task-item[data-task-id='${taskId}']`);
 
@@ -189,8 +184,12 @@ var taskStatusChangeHandler = function (event) {
             tasks[i].status = statusVariable;
         }
     }
+    saveTasks();
 }
 
+var saveTasks = function () {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
 
 formEl.addEventListener('submit', taskFormHandler);
 pageContentEl.addEventListener('click', taskButtonHandler);
