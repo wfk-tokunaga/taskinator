@@ -1,3 +1,4 @@
+var tasks = [];
 var taskIdCounter = 0;
 var pageContentEl = document.querySelector('#page-content');
 var tasksToDoEl = document.querySelector('#tasks-to-do');
@@ -28,6 +29,7 @@ var taskFormHandler = function (event) {
         var taskDataObj = {
             name: taskNameInput,
             type: taskTypeInput,
+            status: "to do"
         };
         createTaskEl(taskDataObj);
     }
@@ -38,6 +40,14 @@ var completeEditTask = function (taskName, taskType, taskId) {
     taskSelected.querySelector("h3.task-name").textContent = taskName;
     taskSelected.querySelector("span.task-type").textContent = taskType;
 
+    debugger;
+    for (var i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(taskId)) {
+            tasks[i].name = taskName;
+            tasks[i].type = taskType;
+        }
+    }
+    debugger;
     alert("task updated!");
 
     // Reset the form
@@ -52,6 +62,7 @@ var completeEditTask = function (taskName, taskType, taskId) {
 //Passing in only one variable that hold both the name and the type, so we are going to make an object
 // We're not passing html elements around, this is kinda the end point of what we're trying to do
 var createTaskEl = function (taskDataObj) {
+    console.log(taskDataObj);
     var listItemEl = document.createElement("li");
     listItemEl.className = "task-item";
 
@@ -64,6 +75,9 @@ var createTaskEl = function (taskDataObj) {
     taskInfoEl.innerHTML = "<h3 class='task-name'>" + taskDataObj.name +
         "</h3><span class='task-type'>" + taskDataObj.type + "</span>";
     listItemEl.appendChild(taskInfoEl);
+    taskDataObj.id = taskIdCounter; //Does this work? Can we just add a new field?
+    tasks.push(taskDataObj);
+    console.log(tasks);
     var taskActionEl = createTaskActions(taskIdCounter);
     listItemEl.appendChild(taskActionEl)
     tasksToDoEl.appendChild(listItemEl);
@@ -142,6 +156,15 @@ var editTask = function (taskId) {
 var deleteTask = function (taskId) {
     var taskSelected = document.querySelector(`.task-item[data-task-id='${taskId}']`);
     taskSelected.remove();
+
+    var updatedTasksArr = [];
+    for (i = 0; i < tasks.length; i++) {
+        if (tasks[i].id !== parseInt(taskId)) {
+            updatedTaskArr.push(tasks[i]);
+        }
+    }
+
+    tasks = updatedTasksArr;
 }
 
 var taskStatusChangeHandler = function (event) {
@@ -158,6 +181,13 @@ var taskStatusChangeHandler = function (event) {
     }
     else if (statusVariable === "completed") {
         tasksCompletedEl.appendChild(taskSelected);
+    }
+
+    // update task's in tasks array
+    for (var i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(taskId)) {
+            tasks[i].status = statusVariable;
+        }
     }
 }
 
